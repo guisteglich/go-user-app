@@ -43,16 +43,13 @@ func ListUsersHandler(c *gin.Context){
 }
 
 func ListUserHandler(c *gin.Context){
-	var user struct {
-		Name string
-	}
-	c.Bind(&user)
+	name := c.Param("Name")
 
-	var users []models.User
+	var user []models.User
 	// Get first matched record
-	initializers.DB.Where("name = ?", user.Name).First(&users)
+	initializers.DB.First(&user, name)
 	c.JSON(200, gin.H{
-		"User": users,
+		"User": user,
 	})
 
 }

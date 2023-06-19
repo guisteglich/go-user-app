@@ -14,9 +14,11 @@ func init(){
 
 func main() {
 	r := gin.Default()
-	r.POST("/user", controllrers.UserHandler)
-	r.GET("/users", controllrers.ListUsersHandler)
-	r.GET("/user", controllrers.ListUserHandler)
+	r.POST("/newUser", controllrers.CreateUserHandler) //Ok
+	r.GET("/users", controllrers.ListUsersHandler) // Ok
+	r.GET("/user", controllrers.ListUserHandler) // Ok
+	r.DELETE("/deleteUser/:id", controllrers.DeleteUserHandler) // Ok
+	
 	r.GET("/buckets", controllrers.ListBucketsHandler)
 	r.POST("/createBucket", controllrers.CreateBucketHandler)
 

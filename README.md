@@ -28,7 +28,7 @@ Depois de configurar as dependências e obter as informações de conexão, siga
 
 1. Clone o repositório para o seu ambiente local:
    ```
-   git clone [URL_DO_REPOSITORIO](https://github.com/guisteglich/go-user-app)
+   git clone https://github.com/guisteglich/go-user-app
    ```
 2. Acesse o diretório do projeto:
    ```

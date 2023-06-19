@@ -3,9 +3,14 @@ package controllrers
 import (
 	"files/initializers"
 	"files/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+type CreateBucketRequest struct {
+	BucketName string `json:"bucketName"`
+}
 
 func UserHandler(c *gin.Context) {
 
@@ -31,11 +36,6 @@ func ListUsersHandler(c *gin.Context){
 	var users []models.User
 	// Get all records
 	initializers.DB.Find(&users)
-	// fmt.Println(result.RowsAffected)
-	// if result.Error != nil{
-	// 	c.Status(404)
-	// 	return
-	// }
 	c.JSON(200, gin.H{
 		"Users": users,
 	})
@@ -52,4 +52,41 @@ func ListUserHandler(c *gin.Context){
 		"User": user,
 	})
 
+}
+
+func ListBucketsHandler(c *gin.Context) {
+	output, err := initializers.ListBuckets()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to list buckets",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"buckets": output,
+	})
+}
+
+
+func CreateBucketHandler(c *gin.Context) {
+	var req CreateBucketRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request payload",
+		})
+		return
+	}
+
+	err := initializers.CreateBucket(req.BucketName)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to create bucket",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Bucket created",
+	})
 }

@@ -1,4 +1,4 @@
-package controllrers
+package controllers
 
 import (
 	"files/initializers"

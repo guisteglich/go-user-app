@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"files/controllrers"
+	"files/controllers"
 	"files/initializers"
 	"files/models"
 )
@@ -37,7 +37,7 @@ func compareResponses(expected createUserResponse, actual createUserResponse) bo
 
 func TestCreateUserHandler(t *testing.T) {
 	router := gin.Default()
-	router.POST("/createUser", controllrers.CreateUserHandler)
+	router.POST("/createUser", controllers.CreateUserHandler)
 
 	user := struct {
 		Name        string `json:"name"`

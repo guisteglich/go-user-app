@@ -4,33 +4,63 @@ import (
 	"files/initializers"
 	"files/models"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
-type CreateBucketRequest struct {
-	BucketName string `json:"bucketName"`
-}
+// ...
 
-func UserHandler(c *gin.Context) {
 
+func CreateUserHandler(c *gin.Context) {
 	var newUser struct {
-		Name string
+		Name        string    `json:"name"`
+		Email       string    `json:"email"`
+		Password    string    `json:"password"`
+		DateOfBirth string    `json:"date_of_birth"`
+		Phone       string    `json:"phone"`
 	}
 
-	c.Bind(&newUser)
-
-	user := models.User{Name: newUser.Name}
-	result := initializers.DB.Create(&user) // pass pointer of data to Create
-	if result.Error != nil{
-		c.Status(400)
+	if err := c.ShouldBindJSON(&newUser); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(201, gin.H{
-		"User": user,
-	})
+	// Criptografar a senha usando bcrypt
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao criptografar a senha"})
+		return
 	}
+
+	// Converter a string da data de nascimento para o tipo time.Time
+	dateOfBirth, err := time.Parse("02/01/2006", newUser.DateOfBirth)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de data de nascimento inválido"})
+		return
+	}
+
+	user := models.User{
+		Name:        newUser.Name,
+		Email:       newUser.Email,
+		Password:    string(hashedPassword),
+		DateOfBirth: dateOfBirth,
+		Phone:       newUser.Phone,
+	}
+
+	initializers.ConnToDB()
+
+	result := initializers.DB.Create(&user)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"user": user,
+	})
+}
 
 func ListUsersHandler(c *gin.Context){
 	var users []models.User
@@ -42,17 +72,49 @@ func ListUsersHandler(c *gin.Context){
 
 }
 
-func ListUserHandler(c *gin.Context){
+func DeleteUserHandler(c *gin.Context) {
+	userID := c.Param("id")
+
+	result := initializers.DB.Delete(&models.User{}, userID)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao excluir usuário"})
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuário não encontrado"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Usuário excluído com sucesso"})
+}
+
+
+
+func ListUserHandler(c *gin.Context) {
+	userID := c.Param("id")
 	name := c.Param("Name")
 
-	var user []models.User
-	// Get first matched record
-	initializers.DB.First(&user, name)
-	c.JSON(200, gin.H{
-		"User": user,
-	})
+	var user models.User
 
+	if name != "" {
+		result := initializers.DB.First(&user, name)
+		if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuário não encontrado"})
+		return
+	}
+	}
+	result := initializers.DB.First(&user, userID)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuário não encontrado"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
+	})
 }
+
 
 func ListBucketsHandler(c *gin.Context) {
 	output, err := initializers.ListBuckets()
@@ -69,7 +131,12 @@ func ListBucketsHandler(c *gin.Context) {
 }
 
 
+
 func CreateBucketHandler(c *gin.Context) {
+	type CreateBucketRequest struct {
+	BucketName string `json:"bucketName"`
+	}
+
 	var req CreateBucketRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

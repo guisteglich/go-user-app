@@ -1,4 +1,4 @@
-# Projeto de Gerenciamento de Usuário com Golang e GORM
+# Projeto de Gerenciamento de Usuários com Golang e Gin
 
 Este projeto é uma aplicação que utiliza a linguagem de programação Go, juntamente com os frameworks Gin e GORM, para criar um serviço de gerenciamento de usuários. Os dados dos usuários são persistidos em um banco de dados PostgreSQL, utilizando o serviço de banco de dados como serviço ElephantSQL. Além disso, este projeto também permite o armazenamento de objetos do usuário, como imagens, em buckets S3 utilizando o LocalStack.
 
@@ -7,22 +7,18 @@ Este projeto é uma aplicação que utiliza a linguagem de programação Go, jun
 
 ## Recursos
 
-- :construction: Cadastro de usuários: permite o cadastro de novos usuários, incluindo informações como nome, e-mail e senha.
+- :heavy_check_mark: Cadastro de usuários: permite o cadastro de novos usuários, incluindo informações como nome, e-mail e senha.
 - :construction: Autenticação: oferece funcionalidades de autenticação e autorização, permitindo que usuários autenticados acessem recursos restritos.
-- :construction: Gerenciamento de objetos do usuário: possibilita o armazenamento de objetos do usuário, como imagens, em buckets S3.
+- :heavy_check_mark: Gerenciamento de objetos do usuário: possibilita o armazenamento de objetos do usuário, como imagens, em buckets S3.
 - Banco de dados: utiliza o GORM para interagir com o banco de dados Postgres hospedado no ElephantSQL, garantindo a persistência dos dados dos usuários.
 
 ## Configuração
 
 Antes de executar o projeto, certifique-se de ter as seguintes dependências instaladas:
 
-- Golang (versão 1.20.5): [https://golang.org/dl/](https://golang.org/dl/)
-- GORM: Execute o seguinte comando para instalar o GORM:
-  ```
-  go get -u gorm.io/gorm
-  ```
-- PostgreSQL: Configure uma instância do PostgreSQL e obtenha as informações de conexão (endereço, porta, nome do banco de dados, usuário e senha).
-- LocalStack: Instale e configure o LocalStack para simular o ambiente S3 localmente.
+- *Golang* (versão 1.20.5): [https://golang.org/dl/](https://golang.org/dl/)
+- *PostgreSQL*: Configure uma instância do PostgreSQL e obtenha as informações de conexão (endereço, porta, nome do banco de dados, usuário e senha).
+- *LocalStack*: Instale e configure o LocalStack para simular o ambiente S3 localmente. [https://github.com/localstack/localstack](https://github.com/localstack/localstack)
 
 Depois de configurar as dependências e obter as informações de conexão, siga as etapas abaixo para executar o projeto:
 

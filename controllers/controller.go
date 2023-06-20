@@ -3,6 +3,8 @@ package controllers
 import (
 	"files/initializers"
 	"files/models"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
@@ -114,6 +116,50 @@ func ListUserHandler(c *gin.Context) {
 		"user": user,
 	})
 }
+
+func UploadUserFile(c *gin.Context) {
+	// recebe o id do usuário
+	userID := c.Param("id")
+	// recebe o arquivo para upload
+	fileForm, err := c.FormFile("file")
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	openedFile, err := fileForm.Open()
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	defer openedFile.Close()
+
+	fileBytes, err := ioutil.ReadAll(openedFile)
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to read file",
+		})
+		return
+	}
+
+	err = initializers.UploadFile("img-"+userID, fileBytes)
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to upload file to bucket",
+		})
+		return
+	}
+
+	// Se o upload foi bem-sucedido
+	c.JSON(http.StatusOK, gin.H{
+		"message": "File uploaded successfully",
+	})
+}
+
 
 
 func ListBucketsHandler(c *gin.Context) {

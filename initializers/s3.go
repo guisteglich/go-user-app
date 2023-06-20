@@ -1,6 +1,7 @@
 package initializers
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -104,6 +105,25 @@ func ListBuckets() ([]types.Bucket, error) {
 
 	return result.Buckets, nil
 }
+
+func UploadFile(objectKey string, fileBytes []byte) error {
+	bucketName := os.Getenv("S3_BUCKET")
+	reader := bytes.NewReader(fileBytes)
+
+
+	_, err := s3svc.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(objectKey),
+		Body:   reader,
+	})
+
+	if err != nil {
+		log.Printf("Couldn't upload file to %v:%v. Here's why: %v\n", bucketName, objectKey, err)
+	}
+
+	return err
+}
+
 
 func listObjects() error {
 	output, err := s3svc.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{

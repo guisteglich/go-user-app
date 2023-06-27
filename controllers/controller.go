@@ -3,6 +3,7 @@ package controllers
 import (
 	"files/initializers"
 	"files/models"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 // ...
@@ -91,8 +93,6 @@ func DeleteUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Usuário excluído com sucesso"})
 }
 
-
-
 func ListUserHandler(c *gin.Context) {
 	userID := c.Param("id")
 	name := c.Param("Name")
@@ -115,6 +115,49 @@ func ListUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"user": user,
 	})
+}
+
+func Auth(c *gin.Context){
+	email := c.PostForm("email")
+	password := c.PostForm("password")
+
+	fmt.Println(email)
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao criptografar a senha"})
+		return
+	}
+
+	var user models.User
+
+	// Executar a consulta usando o GORM
+	err = initializers.DB.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Println("Usuário não encontrado")
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não encontrado"})
+		} else {
+			log.Fatal(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao consultar o banco de dados"})
+		}
+		return
+	}
+	storedPassword := user.Password
+
+	fmt.Println(string(hashedPassword))
+	fmt.Println(storedPassword)
+
+	// Comparar a senha fornecida com a senha armazenada no banco de dados
+	if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Credenciais inválidas"})
+		return
+	}
+
+
+	// Autenticação bem-sucedida
+	c.JSON(http.StatusOK, gin.H{"message": "Autenticação bem-sucedida"})
+
 }
 
 func UploadUserFile(c *gin.Context) {

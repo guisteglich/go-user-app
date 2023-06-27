@@ -18,6 +18,7 @@ func main() {
 	r.GET("/users", controllers.ListUsersHandler) // Ok
 	r.GET("/user", controllers.ListUserHandler) // Ok
 	r.DELETE("/deleteUser/:id", controllers.DeleteUserHandler) // Ok
+	r.POST("/authentication", controllers.Auth)
 
 	r.POST("/upload/:id", controllers.UploadUserFile)
 	r.GET("/buckets", controllers.ListBucketsHandler)

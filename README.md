@@ -8,9 +8,9 @@ Este projeto é uma aplicação que utiliza a linguagem de programação Go, jun
 ## Recursos
 
 - :heavy_check_mark: Cadastro de usuários: permite o cadastro de novos usuários, incluindo informações como nome, e-mail e senha.
-- :construction: Autenticação: oferece funcionalidades de autenticação e autorização, permitindo que usuários autenticados acessem recursos restritos.
+- :heavy_check_mark: Autenticação: oferece funcionalidades de autenticação e autorização, permitindo que usuários autenticados acessem recursos restritos.
 - :heavy_check_mark: Gerenciamento de objetos do usuário: possibilita o armazenamento de objetos do usuário, como imagens, em buckets S3.
-- Banco de dados: utiliza o GORM para interagir com o banco de dados Postgres hospedado no ElephantSQL, garantindo a persistência dos dados dos usuários.
+- :heavy_check_mark: Banco de dados: utiliza o GORM para interagir com o banco de dados Postgres hospedado no ElephantSQL, garantindo a persistência dos dados dos usuários.
 
 ## Configuração
 
